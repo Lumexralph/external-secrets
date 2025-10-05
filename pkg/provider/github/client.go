@@ -18,13 +18,13 @@ package github
 
 import (
 	"context"
-	crypto_rand "crypto/rand"
+	cryptorand "crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"time"
 
-	github "github.com/google/go-github/v56/github"
+	"github.com/google/go-github/v56/github"
 	"golang.org/x/crypto/nacl/box"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -116,7 +116,7 @@ func (g *Client) PushSecret(ctx context.Context, secret *corev1.Secret, remoteRe
 		}
 	}
 
-	encryptedBytes, err := box.SealAnonymous([]byte{}, value, &boxKey, crypto_rand.Reader)
+	encryptedBytes, err := box.SealAnonymous([]byte{}, value, &boxKey, cryptorand.Reader)
 	if err != nil {
 		return fmt.Errorf("box.SealAnonymous failed with error %w", err)
 	}
@@ -158,8 +158,7 @@ func (g *Client) GetSecretMap(_ context.Context, _ esv1.ExternalSecretDataRemote
 }
 
 // Close cleans up any resources.
-func (g *Client) Close(ctx context.Context) error {
-	ctx.Done()
+func (g *Client) Close(_ context.Context) error {
 	return nil
 }
 
@@ -170,9 +169,8 @@ func (g *Client) Validate() (esv1.ValidationResult, error) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	_, _, err := g.listSecretsFn(ctx)
 
-	if err != nil {
+	if _, _, err := g.listSecretsFn(ctx); err != nil {
 		return esv1.ValidationResultError, fmt.Errorf("store is not allowed to list secrets: %w", err)
 	}
 
