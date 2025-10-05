@@ -30,6 +30,7 @@ const (
 	SecretVersionSelectionPolicyLatestOrFetch SecretVersionSelectionPolicy = "LatestOrFetch"
 )
 
+// GCPSMAuth defines the authentication methods for Google Cloud Platform Secret Manager.
 type GCPSMAuth struct {
 	// +optional
 	SecretRef *GCPSMAuthSecretRef `json:"secretRef,omitempty"`
@@ -39,12 +40,14 @@ type GCPSMAuth struct {
 	WorkloadIdentityFederation *GCPWorkloadIdentityFederation `json:"workloadIdentityFederation,omitempty"`
 }
 
+// GCPSMAuthSecretRef contains the secret references for GCP Secret Manager authentication.
 type GCPSMAuthSecretRef struct {
 	// The SecretAccessKey is used for authentication
 	// +optional
 	SecretAccessKey esmeta.SecretKeySelector `json:"secretAccessKeySecretRef,omitempty"`
 }
 
+// GCPWorkloadIdentity defines configuration for workload identity authentication to GCP.
 type GCPWorkloadIdentity struct {
 	// +kubebuilder:validation:Required
 	ServiceAccountRef esmeta.ServiceAccountSelector `json:"serviceAccountRef"`
