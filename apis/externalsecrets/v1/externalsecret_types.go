@@ -368,6 +368,11 @@ type ExternalSecretRewriteMerge struct {
 	// +optional
 	Priority []string `json:"priority,omitempty"`
 
+	// Used to define the policy when a key in the priority list does not exist in the input.
+	// +optional
+	// +kubebuilder:default="Strict"
+	PriorityPolicy ExternalSecretRewriteMergePriorityPolicy `json:"priorityPolicy,omitempty"`
+
 	// Used to define the policy to use in conflict resolution.
 	// +optional
 	// +kubebuilder:default="Error"
@@ -380,6 +385,7 @@ type ExternalSecretRewriteMerge struct {
 }
 
 // ExternalSecretRewriteMergeConflictPolicy defines the policy for resolving conflicts when merging secrets.
+// +kubebuilder:validation:Enum=Ignore;Error
 type ExternalSecretRewriteMergeConflictPolicy string
 
 const (
@@ -389,7 +395,16 @@ const (
 	ExternalSecretRewriteMergeConflictPolicyError ExternalSecretRewriteMergeConflictPolicy = "Error"
 )
 
+// +kubebuilder:validation:Enum=IgnoreNotFound;Strict
+type ExternalSecretRewriteMergePriorityPolicy string
+
+const (
+	ExternalSecretRewriteMergePriorityPolicyIgnoreNotFound ExternalSecretRewriteMergePriorityPolicy = "IgnoreNotFound"
+	ExternalSecretRewriteMergePriorityPolicyStrict         ExternalSecretRewriteMergePriorityPolicy = "Strict"
+)
+
 // ExternalSecretRewriteMergeStrategy defines the strategy for merging secrets.
+// +kubebuilder:validation:Enum=Extract;JSON
 type ExternalSecretRewriteMergeStrategy string
 
 const (
@@ -542,6 +557,7 @@ type GeneratorRef struct {
 }
 
 // ExternalSecretConditionType defines a value type for ExternalSecret conditions.
+// +kubebuilder:validation:Enum=Ready;Deleted
 type ExternalSecretConditionType string
 
 const (

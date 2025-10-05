@@ -29,8 +29,8 @@ import (
 
 	esv1 "github.com/external-secrets/external-secrets/apis/externalsecrets/v1"
 	esmeta "github.com/external-secrets/external-secrets/apis/meta/v1"
-	"github.com/external-secrets/external-secrets/pkg/esutils"
-	"github.com/external-secrets/external-secrets/pkg/esutils/resolvers"
+	"github.com/external-secrets/external-secrets/pkg/utils"
+	"github.com/external-secrets/external-secrets/pkg/utils/resolvers"
 )
 
 const (
@@ -130,7 +130,7 @@ func performAzureAuthLogin(ctx context.Context, store esv1.GenericStore, infisic
 }
 
 func performGcpIDTokenAuthLogin(ctx context.Context, store esv1.GenericStore, infisicalSpec *esv1.InfisicalProvider, sdkClient infisicalSdk.InfisicalClientInterface, kube kclient.Client, namespace string) error {
-	gcpIDTokenAuthCredentials := infisicalSpec.Auth.GcpIDTokenAuthCredentials
+	gcpIDTokenAuthCredentials := infisicalSpec.Auth.GcpIdTokenAuthCredentials
 	identityID, err := GetStoreSecretData(ctx, store, kube, namespace, gcpIDTokenAuthCredentials.IdentityID)
 	if err != nil {
 		return fmt.Errorf(errSecretDataFormat, err)
@@ -361,7 +361,7 @@ func (p *Provider) NewClient(ctx context.Context, store esv1.GenericStore, kube 
 	case infisicalSpec.Auth.AzureAuthCredentials != nil:
 		loginFn = performAzureAuthLogin
 		authMethod = machineIdentityLoginViaAzureAuth
-	case infisicalSpec.Auth.GcpIDTokenAuthCredentials != nil:
+	case infisicalSpec.Auth.GcpIdTokenAuthCredentials != nil:
 		loginFn = performGcpIDTokenAuthLogin
 		authMethod = machineIdentityLoginViaGCPIDTokenAuth
 	case infisicalSpec.Auth.GcpIamAuthCredentials != nil:
@@ -458,12 +458,12 @@ func (p *Provider) ValidateStore(store esv1.GenericStore) (admission.Warnings, e
 	if infisicalStoreSpec.Auth.UniversalAuthCredentials != nil {
 		uaCredential := infisicalStoreSpec.Auth.UniversalAuthCredentials
 		// to validate reference authentication
-		err := esutils.ValidateReferentSecretSelector(store, uaCredential.ClientID)
+		err := utils.ValidateReferentSecretSelector(store, uaCredential.ClientID)
 		if err != nil {
 			return nil, err
 		}
 
-		err = esutils.ValidateReferentSecretSelector(store, uaCredential.ClientSecret)
+		err = utils.ValidateReferentSecretSelector(store, uaCredential.ClientSecret)
 		if err != nil {
 			return nil, err
 		}
